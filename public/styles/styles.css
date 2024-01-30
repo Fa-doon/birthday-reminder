@@ -1,0 +1,60 @@
+/* public/styles/styles.css */
+body {
+  background-color: #ebf0f5;
+}
+.container {
+  max-width: 600px;
+}
+
+.title-text {
+  margin-top: 130px;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+#body {
+  text-align: center;
+  padding: 40px 0;
+  background: #ebf0f5;
+}
+#success {
+  color: #88b04b;
+  font-family: "Nunito Sans", "Helvetica Neue", sans-serif;
+  font-weight: 900;
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+#message {
+  color: #404f5e;
+  font-family: "Nunito Sans", "Helvetica Neue", sans-serif;
+  font-size: 20px;
+  margin: 0;
+  margin-bottom: 10px;
+}
+.checkmark {
+  color: #9abc66;
+  font-size: 100px;
+  line-height: 200px;
+  margin-left: -15px;
+}
+.card {
+  background: white;
+  padding: 60px;
+  border-radius: 4px;
+  box-shadow: 0 2px 3px #c8d0d8;
+  display: inline-block;
+  margin: 0 auto;
+  margin-top: 80px;
+}
+
+.btn-success a {
+  color: white;
+  text-decoration: none;
+}
+
+.btn-success a:hover {
+  color: white;
+  text-decoration: none;
+}
