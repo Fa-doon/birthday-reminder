@@ -39,7 +39,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Scheduling job to send birthday emails by 7am
-const job = schedule.scheduleJob("0 7 * * *", async () => {
+const job = schedule.scheduleJob("52 7 * * *", async () => {
   logger.info("Job is running");
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -60,12 +60,16 @@ const job = schedule.scheduleJob("0 7 * * *", async () => {
     };
 
     // Send email
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        logger.error("Error sending email");
-      } else {
-        logger.info("Birthday email sent");
-      }
+    await new Promise((resolve, reject) => {
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          logger.error("Error sending email", error);
+          reject(error);
+        } else {
+          logger.info("Birthday email sent");
+          resolve(info);
+        }
+      });
     });
   });
 });
