@@ -39,10 +39,23 @@ const transporter = nodemailer.createTransport({
 });
 
 // Scheduling job to send birthday emails by 7am
-const job = schedule.scheduleJob("40 15 * * *", async () => {
+const job = schedule.scheduleJob("53 15 * * *", async () => {
   logger.info("Job is running");
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  await new Promise((resolve, reject) => {
+    // verify connection configuration
+    transporter.verify(function (error, success) {
+      if (error) {
+        logger.error(error);
+        reject(error);
+      } else {
+        logger.info("Server is ready to take our messages");
+        resolve(success);
+      }
+    });
+  });
 
   // Check DB for today's birthdays
   const birthdayToday = await Birthday.find({
@@ -59,12 +72,25 @@ const job = schedule.scheduleJob("40 15 * * *", async () => {
       html: emailContent(username),
     };
 
-    try {
-      const info = await transporter.sendMail(mailOptions);
-      logger.info("Birthday email sent");
-    } catch (error) {
-      logger.error("Error sending email", error);
-    }
+    await new Promise((resolve, reject) => {
+      // send mail
+      transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+          logger.error("Error sending email", err);
+          reject(err);
+        } else {
+          logger.info("Birthday email sent", info);
+          resolve(info);
+        }
+      });
+    });
+
+    // try {
+    //   const info = await transporter.sendMail(mailOptions);
+    //   logger.info("Birthday email sent");
+    // } catch (error) {
+    //   logger.error("Error sending email", error);
+    // }
   }
 
   // birthdayToday.forEach(async (birthday) => {
