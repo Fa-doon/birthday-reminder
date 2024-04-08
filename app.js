@@ -28,10 +28,10 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
+  service: 'Gmail',
+  // host: "smtp.gmail.com",
+  // port: 587,
+  // secure: false,
   auth: {
     user: process.env.USER,
     pass: process.env.APP_PASSWORD,
@@ -39,7 +39,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Scheduling job to send birthday emails by 7am
-const job = schedule.scheduleJob("25 16 * * *", async () => {
+const job = schedule.scheduleJob("49 8 * * *", async () => {
   logger.info("Job is running");
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -84,38 +84,8 @@ const job = schedule.scheduleJob("25 16 * * *", async () => {
         }
       });
     });
-
-    // try {
-    //   const info = await transporter.sendMail(mailOptions);
-    //   logger.info("Birthday email sent");
-    // } catch (error) {
-    //   logger.error("Error sending email", error);
-    // }
   }
 
-  // birthdayToday.forEach(async (birthday) => {
-  //   const { email, username } = birthday;
-
-  //   const mailOptions = {
-  //     from: "Celebration Crew <format.demoprop@gmail.com>",
-  //     to: email,
-  //     subject: "Happy Birthday",
-  //     html: emailContent(username),
-  //   };
-
-  //   // Send email
-  //   await new Promise((resolve, reject) => {
-  //     transporter.sendMail(mailOptions, (error, info) => {
-  //       if (error) {
-  //         logger.error("Error sending email", error);
-  //         reject(error);
-  //       } else {
-  //         logger.info("Birthday email sent");
-  //         resolve(info);
-  //       }
-  //     });
-  //   });
-  // });
 });
 
 // Routes
