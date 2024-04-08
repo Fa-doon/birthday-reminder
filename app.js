@@ -39,7 +39,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Scheduling job to send birthday emails by 7am
-const job = schedule.scheduleJob("49 8 * * *", async () => {
+const job = schedule.scheduleJob("5 9 * * *", async () => {
   logger.info("Job is running");
   const today = new Date();
   today.setHours(0, 0, 0, 0);
