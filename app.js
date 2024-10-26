@@ -28,10 +28,10 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
-  service: 'Gmail',
-  // host: "smtp.gmail.com",
-  // port: 587,
-  // secure: false,
+  service: 'gmail',
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.USER,
     pass: process.env.APP_PASSWORD,
@@ -39,7 +39,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Scheduling job to send birthday emails by 7am
-const job = schedule.scheduleJob("0 7 * * *", async () => {
+const job = schedule.scheduleJob("* * * * *", async () => {
   logger.info("Job is running");
   const today = new Date();
   today.setHours(0, 0, 0, 0);
