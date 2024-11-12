@@ -88,7 +88,7 @@ const transporter = nodemailer.createTransport({
 //   }
 
 // });
-const job = cron.schedule("27 0 * * *", async () => {
+const job = cron.schedule("29 0 * * *", async () => {
   try {
     logger.info("Job is running");
     const today = new Date();
