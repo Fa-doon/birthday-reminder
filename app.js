@@ -3,7 +3,8 @@ const path = require("path");
 const { connectToDb } = require("./db");
 const Birthday = require("./models/Birthday");
 const nodemailer = require("nodemailer");
-const schedule = require("node-schedule");
+const cron = require("node-cron");
+// const schedule = require("node-schedule");
 const { emailContent } = require("./emailContent");
 const logger = require("./logger/logger");
 
@@ -39,53 +40,103 @@ const transporter = nodemailer.createTransport({
 });
 
 // Scheduling job to send birthday emails by 7am
-const job = schedule.scheduleJob("15 0 * * *", async () => {
-  logger.info("Job is running");
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+// const job = schedule.scheduleJob("15 0 * * *", async () => {
+//   logger.info("Job is running");
+//   const today = new Date();
+//   today.setHours(0, 0, 0, 0);
 
-  await new Promise((resolve, reject) => {
-    // verify connection configuration
-    transporter.verify(function (error, success) {
-      if (error) {
-        logger.error(error);
-        reject(error);
-      } else {
-        logger.info("Server is ready to take our messages");
-        resolve(success);
-      }
-    });
-  });
+//   await new Promise((resolve, reject) => {
+//     // verify connection configuration
+//     transporter.verify(function (error, success) {
+//       if (error) {
+//         logger.error(error);
+//         reject(error);
+//       } else {
+//         logger.info("Server is ready to take our messages");
+//         resolve(success);
+//       }
+//     });
+//   });
 
-  // Check DB for today's birthdays
-  const birthdayToday = await Birthday.find({
-    dob: { $gte: today, $lt: new Date(today.getTime() + 86400000) },
-  });
+//   // Check DB for today's birthdays
+//   const birthdayToday = await Birthday.find({
+//     dob: { $gte: today, $lt: new Date(today.getTime() + 86400000) },
+//   });
 
-  for (const birthday of birthdayToday) {
-    const { email, username } = birthday;
+//   for (const birthday of birthdayToday) {
+//     const { email, username } = birthday;
 
-    const mailOptions = {
-      from: "Celebration Crew <format.demoprop@gmail.com>",
-      to: email,
-      subject: "Happy Birthday",
-      html: emailContent(username),
-    };
+//     const mailOptions = {
+//       from: "Celebration Crew <format.demoprop@gmail.com>",
+//       to: email,
+//       subject: "Happy Birthday",
+//       html: emailContent(username),
+//     };
+
+//     await new Promise((resolve, reject) => {
+//       // send mail
+//       transporter.sendMail(mailOptions, (err, info) => {
+//         if (err) {
+//           logger.error("Error sending email", err);
+//           reject(err);
+//         } else {
+//           logger.info("Birthday email sent", info);
+//           resolve(info);
+//         }
+//       });
+//     });
+//   }
+
+// });
+const job = cron.schedule("27 0 * * *", async () => {
+  try {
+    logger.info("Job is running");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     await new Promise((resolve, reject) => {
-      // send mail
-      transporter.sendMail(mailOptions, (err, info) => {
-        if (err) {
-          logger.error("Error sending email", err);
-          reject(err);
+      transporter.verify((error, success) => {
+        if (error) {
+          logger.error("Error verifying transporter", error);
+          reject(error);
         } else {
-          logger.info("Birthday email sent", info);
-          resolve(info);
+          logger.info("Server is ready to take our messages");
+          resolve(success);
         }
       });
     });
-  }
 
+    const birthdayToday = await Birthday.find({
+      dob: { $gte: today, $lt: new Date(today.getTime() + 86400000) },
+    });
+
+    for (const birthday of birthdayToday) {
+      const { email, username } = birthday;
+
+      const mailOptions = {
+        from: "Celebration Crew <format.demoprop@gmail.com>",
+        to: email,
+        subject: "Happy Birthday",
+        html: emailContent(username),
+      };
+
+      await new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) {
+            logger.error("Error sending email", err);
+            reject(err);
+          } else {
+            logger.info("Birthday email sent", info);
+            resolve(info);
+          }
+        });
+      });
+    }
+  } catch (error) {
+    logger.error("Error in cron job", error);
+  }
+}, {
+  scheduled: true
 });
 
 // Routes
